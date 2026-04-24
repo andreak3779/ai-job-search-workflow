@@ -32,19 +32,21 @@ Modular prompt templates — called "skills" — each scoped to a specific workf
 
 | Skill | Purpose |
 |---|---|
-| `gap-analysis` | Compares resume against a job description; produces fit rating, strength/gap breakdown, application strategy |
+| `gap-analysis` | Compares resume against a job description; produces fit rating, strength/gap breakdown, and application strategy |
 | `cover-letter-and-resume` | Generates ATS-optimized DOCX resume + cover letter tailored to a specific posting |
-| `learning-plan` | Converts gap analysis output into a phased PDF learning plan with verified course URLs |
-| `pluralsight-updater` | Keeps the completed courses file current as new courses are finished |
-| `linkedin-updater` | Produces ready-to-paste copy for every LinkedIn profile field |
+| `generate-general-resume` | Generates a general-purpose base resume for job boards and recruiter submissions |
+| `learning-plan` | Converts gap analysis output into a phased learning plan with verified course URLs |
+| `interview-prep` | Generates a role-specific interview guide covering phone screen, technical, system design, and behavioural rounds |
+| `azure-focused-net-developer` | Specialized workflow routing and ATS keyword reference for Azure/.NET roles |
+| `salary-research` | Researches market salary and contract rates; produces a negotiation-ready reference document |
 
 Each skill file specifies: inputs required, step-by-step workflow, output format, file naming conventions, and ATS/formatting rules.
 
 ### 3. Document Generation Pipeline
 Application documents are generated as formatted files — not markdown — to match recruiter and ATS expectations:
 
-- **Resumes and cover letters:** Node.js + `docx` library; templated JS files with `// FILL:` sections; Arial/Carlito fonts, ATS-safe formatting (no tables, no columns, no text boxes)
-- **Learning plan PDFs:** Python + ReportLab; phased course cards with color-coded priority levels and clickable URLs
+- **Resumes and cover letters:** Node.js + `docx` library; templated JS files with `// FILL:` sections; ATS-safe formatting (no tables, no columns, no text boxes)
+- **Learning plan PDFs:** Python + ReportLab; phased course cards with colour-coded priority levels and clickable URLs
 
 Templates enforce consistent formatting across every document — margins, spacing, section order, bullet style — so outputs don't need manual cleanup.
 
@@ -74,23 +76,43 @@ All workflows load the same canonical files rather than relying on session memor
 Context files are designed to be lean — titles only in course lists, concise gap descriptions, no verbose explanations. Claude loads multiple files per session; token cost compounds quickly if files are bloated.
 
 **ATS compliance as a constraint, not an afterthought**
-Resume templates enforce ATS rules structurally: no tables, no columns, no headers/footers, standard section headings, plain bullet characters, no color. These are baked into the template — they can't be broken by filling in content.
+Resume templates enforce ATS rules structurally: no tables, no columns, no headers/footers, standard section headings, plain bullet characters, no colour. These are baked into the template — they can't be broken by filling in content.
 
 **Verified URLs only**
-The learning plan skill maintains a verified course URL file. Slugs are confirmed live before inclusion. The system never guesses a Pluralsight URL — hallucinated course links are a silent failure mode that undermines the whole output.
+The learning plan skill maintains a verified course URL reference. Slugs are confirmed live before inclusion. The system never guesses a course URL — hallucinated links are a silent failure mode that undermines the whole output.
 
 **Gap classification discipline**
-The gap analysis skill distinguishes between four states: strong match (production experience), framing gap (skill exists but not surfaced), course-level (Pluralsight only, no production use), and genuine gap (not present). Softening genuine gaps is explicitly prohibited. This keeps the output honest and the application strategy realistic.
+The gap analysis skill distinguishes between four states: strong match (production experience), framing gap (skill exists but not surfaced), course-level (coursework only, no production use), and genuine gap (not present). Softening genuine gaps is explicitly prohibited — this keeps the output honest and the application strategy realistic.
+
+**Stage-aware interview preparation**
+The interview prep skill scopes content to the interview stage (phone screen / technical / final round). Bringing final-round depth to a phone screen is as much a failure mode as being underprepared.
 
 ---
 
-## Example Outputs
+## Repo Structure
 
-*All examples are anonymized — real company names and personal contact details are not included.*
+```
+/
+├── README.md
+└── examples/
+    ├── profile-facts-template.md        — template for the source-of-truth profile facts file
+    ├── skills/
+    │   ├── gap-analysis-SKILL.md
+    │   ├── cover-letter-resume-SKILL.md
+    │   ├── generate-general-resume-SKILL.md
+    │   ├── learning-plan-SKILL.md
+    │   ├── interview-prep-SKILL.md
+    │   ├── azure-focused-net-developer-SKILL.md
+    │   └── salary-research-SKILL.md
+    ├── templates/
+    │   ├── resume-template.js            — JD-tailored resume scaffold
+    │   ├── cover-letter-template.js      — cover letter scaffold
+    │   └── general-resume-template.js    — base resume scaffold for job boards
+    └── sample-outputs/
+        └── gap-analysis-sample.md        — anonymized example gap analysis output
+```
 
-- [`examples/gap-analysis-sample.md`](examples/gap-analysis-sample.md) — gap analysis for a fictional .NET Developer posting
-- [`examples/skill-template-sample.md`](examples/skill-template-sample.md) — anonymized skill file showing structure and workflow format
-- [`examples/prompt-template-sample.md`](examples/prompt-template-sample.md) — example context prompt showing how source-of-truth files are referenced
+All examples are anonymized — personal contact details and employer names have been replaced with placeholders.
 
 ---
 
