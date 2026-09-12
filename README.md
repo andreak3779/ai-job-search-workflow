@@ -120,7 +120,7 @@ All examples are anonymized — personal contact details and employer names have
 
 | Layer | Technology |
 |---|---|
-| AI | Claude (Anthropic) |
+| AI | Claude (Anthropic), via Claude Code for VS Code |
 | Prompt architecture | Structured instruction system / skill library |
 | Resume / cover letter generation | Node.js · `docx` npm package |
 | PDF generation | Python · ReportLab |
